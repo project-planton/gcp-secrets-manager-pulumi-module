@@ -6,8 +6,6 @@ replace github.com/plantoncloud/planton-cloud-apis => ../../plantoncloud/planton
 
 replace github.com/plantoncloud/stack-job-runner-golang-sdk => ../../plantoncloud/stack-job-runner-golang-sdk
 
-replace github.com/plantoncloud-inc/go-commons => ../../plantoncloud-inc/go-commons
-
 replace github.com/plantoncloud/pulumi-module-golang-commons => ../../plantoncloud/pulumi-module-golang-commons
 
 require (
@@ -16,7 +14,7 @@ require (
 	github.com/plantoncloud/pulumi-module-golang-commons v0.0.0-20240722171224-c185089f30b0
 	github.com/plantoncloud/stack-job-runner-golang-sdk v0.0.52
 	github.com/pulumi/pulumi-gcp/sdk/v7 v7.29.0
-	github.com/pulumi/pulumi/sdk/v3 v3.122.0
+	github.com/pulumi/pulumi/sdk/v3 v3.124.0
 )
 
 require (

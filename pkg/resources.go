@@ -1,11 +1,10 @@
-package gcpsecretsmanagersecretset
+package pkg
 
 import (
 	"fmt"
 	"github.com/pkg/errors"
 	"github.com/plantoncloud/planton-cloud-apis/zzgo/cloud/planton/apis/code2cloud/v1/gcp/gcpsecretsmanagersecretset/model"
-	"github.com/plantoncloud/planton-cloud-apis/zzgo/cloud/planton/apis/commons/english/enums/englishword"
-	"github.com/plantoncloud/pulumi-module-golang-commons/pkg/gcp/pulumigoogleprovider"
+	"github.com/plantoncloud/pulumi-module-golang-commons/pkg/provider/gcp/pulumigoogleprovider"
 	"github.com/pulumi/pulumi-gcp/sdk/v7/go/gcp/secretmanager"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
@@ -20,21 +19,26 @@ type ResourceStack struct {
 }
 
 func (s *ResourceStack) Resources(ctx *pulumi.Context) error {
+	//create gcp provider using the credentials from the input
 	gcpProvider, err := pulumigoogleprovider.Get(ctx, s.Input.GcpCredential)
 	if err != nil {
 		return errors.Wrap(err, "failed to setup gcp provider")
 	}
 
+	//create a variable with descriptive name for the api-resource
 	gcpSecretsManagerSecretSet := s.Input.ApiResource
 
+	//for each secret in the input spec, create a secret on gcp secrets-manager
 	for _, secretName := range gcpSecretsManagerSecretSet.Spec.SecretNames {
 		if secretName == "" {
 			continue
 		}
 
+		//construct the id of the secret to make it unique with in the google cloud project
 		secretId := fmt.Sprintf("%s-%s", gcpSecretsManagerSecretSet.Metadata.Id, secretName)
 
-		addedSecret, err := secretmanager.NewSecret(ctx, secretName, &secretmanager.SecretArgs{
+		//create the secret resource
+		createdSecret, err := secretmanager.NewSecret(ctx, secretName, &secretmanager.SecretArgs{
 			Labels:   pulumi.ToStringMap(s.GcpLabels),
 			Project:  pulumi.String(gcpSecretsManagerSecretSet.Spec.ProjectId),
 			SecretId: pulumi.String(secretId),
@@ -43,24 +47,23 @@ func (s *ResourceStack) Resources(ctx *pulumi.Context) error {
 			},
 		}, pulumi.Provider(gcpProvider))
 		if err != nil {
-			return errors.Wrap(err, "failed to add secret")
+			return errors.Wrap(err, "failed to create secret")
 		}
+
+		//create secret-version with a placeholder value
 		_, err = secretmanager.NewSecretVersion(ctx, secretId, &secretmanager.SecretVersionArgs{
 			Enabled:    pulumi.Bool(true),
-			Secret:     addedSecret.Name,
+			Secret:     createdSecret.Name,
 			SecretData: pulumi.String(PlaceholderSecretValue),
 		},
-			pulumi.Parent(addedSecret),
+			pulumi.Parent(createdSecret),
 			pulumi.IgnoreChanges([]string{"secretData"}))
 		if err != nil {
-			return errors.Wrap(err, "failed to add placeholder secret version")
+			return errors.Wrap(err, "failed to create placeholder secret version")
 		}
-		ctx.Export(GetSecretIdOutputName(secretName), addedSecret.SecretId)
+
+		//export the id of the secret
+		ctx.Export(fmt.Sprintf("%s-id", secretName), createdSecret.SecretId)
 	}
 	return nil
-}
-
-func GetSecretIdOutputName(secretName string) string {
-	return pulumigoogleprovider.PulumiOutputName(secretmanager.Secret{}, secretName,
-		englishword.EnglishWord_id.String())
 }
