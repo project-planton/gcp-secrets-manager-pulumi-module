@@ -3,7 +3,7 @@ package pkg
 import (
 	"fmt"
 	"github.com/pkg/errors"
-	"github.com/plantoncloud/planton-cloud-apis/zzgo/cloud/planton/apis/code2cloud/v1/gcp/gcpsecretsmanagersecretset/model"
+	"github.com/plantoncloud/planton-cloud-apis/zzgo/cloud/planton/apis/code2cloud/v1/gcp/gcpsecretset/model"
 	"github.com/plantoncloud/pulumi-module-golang-commons/pkg/provider/gcp/pulumigoogleprovider"
 	"github.com/pulumi/pulumi-gcp/sdk/v7/go/gcp/secretmanager"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
@@ -14,7 +14,7 @@ const (
 )
 
 type ResourceStack struct {
-	Input     *model.GcpSecretsManagerSecretSetStackInput
+	Input     *model.GcpSecretSetStackInput
 	GcpLabels map[string]string
 }
 
@@ -26,21 +26,21 @@ func (s *ResourceStack) Resources(ctx *pulumi.Context) error {
 	}
 
 	//create a variable with descriptive name for the api-resource
-	gcpSecretsManagerSecretSet := s.Input.ApiResource
+	gcpSecretSet := s.Input.ApiResource
 
 	//for each secret in the input spec, create a secret on gcp secrets-manager
-	for _, secretName := range gcpSecretsManagerSecretSet.Spec.SecretNames {
+	for _, secretName := range gcpSecretSet.Spec.SecretNames {
 		if secretName == "" {
 			continue
 		}
 
 		//construct the id of the secret to make it unique with in the google cloud project
-		secretId := fmt.Sprintf("%s-%s", gcpSecretsManagerSecretSet.Metadata.Id, secretName)
+		secretId := fmt.Sprintf("%s-%s", gcpSecretSet.Metadata.Id, secretName)
 
 		//create the secret resource
 		createdSecret, err := secretmanager.NewSecret(ctx, secretName, &secretmanager.SecretArgs{
 			Labels:   pulumi.ToStringMap(s.GcpLabels),
-			Project:  pulumi.String(gcpSecretsManagerSecretSet.Spec.ProjectId),
+			Project:  pulumi.String(gcpSecretSet.Spec.ProjectId),
 			SecretId: pulumi.String(secretId),
 			Replication: secretmanager.SecretReplicationArgs{
 				Auto: secretmanager.SecretReplicationAutoArgs{},

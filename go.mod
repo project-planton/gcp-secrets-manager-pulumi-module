@@ -1,4 +1,4 @@
-module github.com/plantoncloud/gcp-secrets-manager-secret-set-pulumi-module
+module github.com/plantoncloud/gcp-secret-set-pulumi-module
 
 go 1.22
 
@@ -10,7 +10,7 @@ go 1.22
 
 require (
 	github.com/pkg/errors v0.9.1
-	github.com/plantoncloud/planton-cloud-apis v0.1.0
+	github.com/plantoncloud/planton-cloud-apis v0.1.2
 	github.com/plantoncloud/pulumi-module-golang-commons v0.0.0-20240808151947-30fe31a468ca
 	github.com/plantoncloud/stack-job-runner-golang-sdk v0.0.56
 	github.com/pulumi/pulumi-gcp/sdk/v7 v7.29.0
