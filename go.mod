@@ -1,4 +1,4 @@
-module github.com/plantoncloud/gcp-secret-set-pulumi-module
+module github.com/plantoncloud/gcp-secrets-manager-pulumi-module
 
 go 1.22
 
