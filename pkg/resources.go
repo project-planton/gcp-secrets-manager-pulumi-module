@@ -14,33 +14,31 @@ const (
 )
 
 type ResourceStack struct {
-	Input     *gcpsecretsmanager.GcpSecretsManagerStackInput
-	GcpLabels map[string]string
+	StackInput *gcpsecretsmanager.GcpSecretsManagerStackInput
 }
 
 func (s *ResourceStack) Resources(ctx *pulumi.Context) error {
+	locals := initializeLocals(ctx, s.StackInput)
+
 	//create gcp provider using the credentials from the input
-	gcpProvider, err := pulumigoogleprovider.Get(ctx, s.Input.GcpCredential)
+	gcpProvider, err := pulumigoogleprovider.Get(ctx, s.StackInput.GcpCredential)
 	if err != nil {
 		return errors.Wrap(err, "failed to setup gcp provider")
 	}
 
-	//create a variable with descriptive name for the api-resource
-	gcpSecretSet := s.Input.ApiResource
-
 	//for each secret in the input spec, create a secret on gcp secrets-manager
-	for _, secretName := range gcpSecretSet.Spec.SecretNames {
+	for _, secretName := range locals.GcpSecretsManager.Spec.SecretNames {
 		if secretName == "" {
 			continue
 		}
 
 		//construct the id of the secret to make it unique with in the google cloud project
-		secretId := fmt.Sprintf("%s-%s", gcpSecretSet.Metadata.Id, secretName)
+		secretId := fmt.Sprintf("%s-%s", locals.GcpSecretsManager.Metadata.Id, secretName)
 
 		//create the secret resource
 		createdSecret, err := secretmanager.NewSecret(ctx, secretName, &secretmanager.SecretArgs{
-			Labels:   pulumi.ToStringMap(s.GcpLabels),
-			Project:  pulumi.String(gcpSecretSet.Spec.ProjectId),
+			Labels:   pulumi.ToStringMap(locals.GcpLabels),
+			Project:  pulumi.String(locals.GcpSecretsManager.Spec.ProjectId),
 			SecretId: pulumi.String(secretId),
 			Replication: secretmanager.SecretReplicationArgs{
 				Auto: secretmanager.SecretReplicationAutoArgs{},
