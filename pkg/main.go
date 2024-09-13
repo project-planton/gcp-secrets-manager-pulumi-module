@@ -13,15 +13,11 @@ const (
 	PlaceholderSecretValue = "placeholder"
 )
 
-type ResourceStack struct {
-	StackInput *gcpsecretsmanager.GcpSecretsManagerStackInput
-}
-
-func (s *ResourceStack) Resources(ctx *pulumi.Context) error {
-	locals := initializeLocals(ctx, s.StackInput)
+func Resources(ctx *pulumi.Context, stackInput *gcpsecretsmanager.GcpSecretsManagerStackInput) error {
+	locals := initializeLocals(ctx, stackInput)
 
 	//create gcp provider using the credentials from the input
-	gcpProvider, err := pulumigoogleprovider.Get(ctx, s.StackInput.GcpCredential)
+	gcpProvider, err := pulumigoogleprovider.Get(ctx, stackInput.GcpCredential)
 	if err != nil {
 		return errors.Wrap(err, "failed to setup gcp provider")
 	}
