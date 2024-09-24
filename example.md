@@ -1,119 +1,44 @@
-Here are a few examples for the `MicroserviceKubernetes` API resource, showcasing different configurations with environment variables and secrets.
+Here are a few examples for the `GcpSecretsManager` API resource, modeled in a similar way to how you created examples for the `MicroserviceKubernetes` API.
 
-# Create using CLI
-
-Create a YAML file using one of the examples shown below. After the YAML is created, use the following command to apply it:
-
-```shell
-planton apply -f <yaml-path>
-```
-
-## Basic Example
-
-This example demonstrates a simple microservice configuration using a basic container running `nginx`.
+### Example 1: Basic Google Cloud Secrets Manager Setup
 
 ```yaml
 apiVersion: code2cloud.planton.cloud/v1
-kind: MicroserviceKubernetes
+kind: GcpSecretsManager
 metadata:
-  name: todo-list-api
+  name: prod-secrets
 spec:
-  environmentInfo:
-    envId: my-org-prod
-  version: main
-  container:
-    app:
-      image:
-        repo: nginx
-        tag: latest
-      ports:
-        - appProtocol: http
-          containerPort: 8080
-          isIngressPort: true
-          servicePort: 80
-      resources:
-        requests:
-          cpu: 100m
-          memory: 100Mi
-        limits:
-          cpu: 2000m
-          memory: 2Gi
+  gcp_credential_id: my-gcp-credentials
+  project_id: my-gcp-project
+  secret_names:
+    - database-password
+    - api-key
 ```
 
-## Example with Environment Variables
-
-This example includes environment variables passed to the container for configuring database information.
+### Example 2: Google Cloud Secrets Manager with Multiple Secrets
 
 ```yaml
 apiVersion: code2cloud.planton.cloud/v1
-kind: MicroserviceKubernetes
+kind: GcpSecretsManager
 metadata:
-  name: todo-list-api
+  name: dev-secrets
 spec:
-  environmentInfo:
-    envId: my-org-prod
-  version: main
-  container:
-    app:
-      env:
-        variables:
-          DATABASE_NAME: todo
-      image:
-        repo: nginx
-        tag: latest
-      ports:
-        - appProtocol: http
-          containerPort: 8080
-          isIngressPort: true
-          name: rest-api
-          networkProtocol: TCP
-          servicePort: 80
-      resources:
-        requests:
-          cpu: 100m
-          memory: 100Mi
-        limits:
-          cpu: 2000m
-          memory: 2Gi
+  gcp_credential_id: my-dev-gcp-credentials
+  project_id: dev-gcp-project
+  secret_names:
+    - jwt-secret
+    - database-url
+    - oauth-token
 ```
 
-## Example with Environment Secrets
-
-This example shows how to use secrets managed by Planton Cloud's GCP Secrets Manager module to securely pass sensitive data to the application.
+### Example 3: Google Cloud Secrets Manager with Empty Spec
 
 ```yaml
 apiVersion: code2cloud.planton.cloud/v1
-kind: MicroserviceKubernetes
+kind: GcpSecretsManager
 metadata:
-  name: todo-list-api
+  name: minimal-secrets
 spec:
-  environmentInfo:
-    envId: my-org-prod
-  version: main
-  container:
-    app:
-      env:
-        secrets:
-          # The key before the dot 'gcpsm-my-org-prod-gcp-secrets' is the ID of the GCP Secret Manager resource
-          # The key after the dot 'database-password' is the specific secret stored in the GCP Secret Manager
-          DATABASE_PASSWORD: ${gcpsm-my-org-prod-gcp-secrets.database-password}
-        variables:
-          DATABASE_NAME: todo
-      image:
-        repo: nginx
-        tag: latest
-      ports:
-        - appProtocol: http
-          containerPort: 8080
-          isIngressPort: true
-          name: rest-api
-          networkProtocol: TCP
-          servicePort: 80
-      resources:
-        requests:
-          cpu: 100m
-          memory: 100Mi
-        limits:
-          cpu: 2000m
-          memory: 2Gi
+  gcp_credential_id: my-gcp-credentials
+  project_id: my-gcp-project
 ```
