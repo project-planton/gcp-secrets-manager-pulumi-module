@@ -1,19 +1,18 @@
 package pkg
 
 import (
-	"github.com/plantoncloud/project-planton/apis/zzgo/cloud/planton/apis/code2cloud/v1/gcp/gcpsecretsmanager"
-	"github.com/plantoncloud/project-planton/apis/zzgo/cloud/planton/apis/commons/apiresource/enums/apiresourcekind"
+	gcpsecretsmanagerv1 "buf.build/gen/go/plantoncloud/project-planton/protocolbuffers/go/project/planton/apis/provider/gcp/gcpsecretsmanager/v1"
 	"github.com/plantoncloud/pulumi-module-golang-commons/pkg/provider/gcp/gcplabelkeys"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 	"strconv"
 )
 
 type Locals struct {
-	GcpSecretsManager *gcpsecretsmanager.GcpSecretsManager
+	GcpSecretsManager *gcpsecretsmanagerv1.GcpSecretsManager
 	GcpLabels         map[string]string
 }
 
-func initializeLocals(ctx *pulumi.Context, stackInput *gcpsecretsmanager.GcpSecretsManagerStackInput) *Locals {
+func initializeLocals(ctx *pulumi.Context, stackInput *gcpsecretsmanagerv1.GcpSecretsManagerStackInput) *Locals {
 	locals := &Locals{}
 	locals.GcpSecretsManager = stackInput.Target
 
@@ -21,7 +20,7 @@ func initializeLocals(ctx *pulumi.Context, stackInput *gcpsecretsmanager.GcpSecr
 		gcplabelkeys.Resource:     strconv.FormatBool(true),
 		gcplabelkeys.Organization: locals.GcpSecretsManager.Spec.EnvironmentInfo.OrgId,
 		gcplabelkeys.Environment:  locals.GcpSecretsManager.Spec.EnvironmentInfo.EnvId,
-		gcplabelkeys.ResourceKind: apiresourcekind.ApiResourceKind_gcp_secrets_manager.String(),
+		gcplabelkeys.ResourceKind: "gcp_secrets_manager",
 		gcplabelkeys.ResourceId:   locals.GcpSecretsManager.Metadata.Id,
 	}
 	return locals

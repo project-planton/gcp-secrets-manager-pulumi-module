@@ -1,9 +1,9 @@
 package pkg
 
 import (
+	gcpsecretsmanagerv1 "buf.build/gen/go/plantoncloud/project-planton/protocolbuffers/go/project/planton/apis/provider/gcp/gcpsecretsmanager/v1"
 	"fmt"
 	"github.com/pkg/errors"
-	"github.com/plantoncloud/project-planton/apis/zzgo/cloud/planton/apis/code2cloud/v1/gcp/gcpsecretsmanager"
 	"github.com/plantoncloud/pulumi-module-golang-commons/pkg/provider/gcp/pulumigoogleprovider"
 	"github.com/pulumi/pulumi-gcp/sdk/v7/go/gcp/secretmanager"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
@@ -13,7 +13,7 @@ const (
 	PlaceholderSecretValue = "placeholder"
 )
 
-func Resources(ctx *pulumi.Context, stackInput *gcpsecretsmanager.GcpSecretsManagerStackInput) error {
+func Resources(ctx *pulumi.Context, stackInput *gcpsecretsmanagerv1.GcpSecretsManagerStackInput) error {
 	locals := initializeLocals(ctx, stackInput)
 
 	//create gcp provider using the credentials from the input
