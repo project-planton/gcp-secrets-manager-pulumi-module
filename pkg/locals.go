@@ -14,14 +14,24 @@ type Locals struct {
 
 func initializeLocals(ctx *pulumi.Context, stackInput *gcpsecretsmanagerv1.GcpSecretsManagerStackInput) *Locals {
 	locals := &Locals{}
+
+	//if the id is empty, use name as id
+	if stackInput.Target.Metadata.Id == "" {
+		stackInput.Target.Metadata.Id = stackInput.Target.Metadata.Name
+	}
+
 	locals.GcpSecretsManager = stackInput.Target
 
 	locals.GcpLabels = map[string]string{
 		gcplabelkeys.Resource:     strconv.FormatBool(true),
-		gcplabelkeys.Organization: locals.GcpSecretsManager.Spec.EnvironmentInfo.OrgId,
-		gcplabelkeys.Environment:  locals.GcpSecretsManager.Spec.EnvironmentInfo.EnvId,
 		gcplabelkeys.ResourceKind: "gcp_secrets_manager",
 		gcplabelkeys.ResourceId:   locals.GcpSecretsManager.Metadata.Id,
 	}
+
+	if locals.GcpSecretsManager.Spec.EnvironmentInfo != nil {
+		locals.GcpLabels[gcplabelkeys.Organization] = locals.GcpSecretsManager.Spec.EnvironmentInfo.OrgId
+		locals.GcpLabels[gcplabelkeys.Environment] = locals.GcpSecretsManager.Spec.EnvironmentInfo.EnvId
+	}
+
 	return locals
 }
