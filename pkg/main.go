@@ -22,6 +22,8 @@ func Resources(ctx *pulumi.Context, stackInput *gcpsecretsmanagerv1.GcpSecretsMa
 		return errors.Wrap(err, "failed to setup gcp provider")
 	}
 
+	secretIdMap := map[string]string{}
+
 	//for each secret in the input spec, create a secret on gcp secrets-manager
 	for _, secretName := range locals.GcpSecretsManager.Spec.SecretNames {
 		if secretName == "" {
@@ -56,8 +58,9 @@ func Resources(ctx *pulumi.Context, stackInput *gcpsecretsmanagerv1.GcpSecretsMa
 			return errors.Wrap(err, "failed to create placeholder secret version")
 		}
 
-		//export the id of the secret
-		ctx.Export(fmt.Sprintf("%s-id", secretName), createdSecret.SecretId)
+		secretIdMap[fmt.Sprintf("%s-id", secretName)] = secretId
 	}
+	//export the id of the secret
+	ctx.Export("secret_id_map", pulumi.ToStringMap(secretIdMap))
 	return nil
 }
