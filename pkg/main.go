@@ -58,7 +58,7 @@ func Resources(ctx *pulumi.Context, stackInput *gcpsecretsmanagerv1.GcpSecretsMa
 			return errors.Wrap(err, "failed to create placeholder secret version")
 		}
 
-		secretIdMap[fmt.Sprintf("%s-id", secretName)] = secretId
+		secretIdMap[secretName] = secretId
 	}
 	//export the id of the secret
 	ctx.Export("secret_id_map", pulumi.ToStringMap(secretIdMap))
