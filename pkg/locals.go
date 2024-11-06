@@ -28,9 +28,12 @@ func initializeLocals(ctx *pulumi.Context, stackInput *gcpsecretsmanagerv1.GcpSe
 		gcplabelkeys.ResourceId:   locals.GcpSecretsManager.Metadata.Id,
 	}
 
-	if locals.GcpSecretsManager.Spec.EnvironmentInfo != nil {
-		locals.GcpLabels[gcplabelkeys.Organization] = locals.GcpSecretsManager.Spec.EnvironmentInfo.OrgId
-		locals.GcpLabels[gcplabelkeys.Environment] = locals.GcpSecretsManager.Spec.EnvironmentInfo.EnvId
+	if locals.GcpSecretsManager.Metadata.Org != "" {
+		locals.GcpLabels[gcplabelkeys.Organization] = locals.GcpSecretsManager.Metadata.Org
+	}
+
+	if locals.GcpSecretsManager.Metadata.Env != nil {
+		locals.GcpLabels[gcplabelkeys.Environment] = locals.GcpSecretsManager.Metadata.Env.Id
 	}
 
 	return locals
